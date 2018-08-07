@@ -1,0 +1,34 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Template for provisioning IAM Role for Managing EKS
+
+Parameters:
+  RoleName:
+    Type: String
+    Default: eksServiceRole
+    Description: The name of the IAM Role
+
+Resources:
+  EKSIAMRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+              Service:
+                - eks.amazonaws.com
+          Action: 
+            - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+        - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+      RoleName: !Ref RoleName
+
+Outputs:
+  EKSRoleARN: 
+    Description: The ARN of eksServiceRole
+    Value: !GetAtt EKSIAMRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-role-arn"

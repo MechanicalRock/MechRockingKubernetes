@@ -1,0 +1,31 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: EKS Cluster Template
+
+Parameters:
+  ClusterName:
+    Type: String
+    Default: EKSCluster
+    Description: The name of the EKS Cluster
+
+Resources:
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Ref ClusterName
+      ResourcesVpcConfig:
+        SecurityGroupIds: !Split [ ',', !ImportValue eksVPC-control-plane-security-group ]
+        SubnetIds: !Split [ ',' , !ImportValue eksVPC-subnets ]
+      RoleArn: !ImportValue eksServiceRole-role-arn
+
+Outputs:
+  EKSRoleARN:
+    Description: The ARN of the EKS Cluster
+    Value: !GetAtt EKSCluster.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-cluster-arn"
+  EKSClusterName:
+    Description: The Name of the Cluster
+    Value: !Ref ClusterName
+    Export:
+      Name: !Sub "${AWS::StackName}-cluster-name"

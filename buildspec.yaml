@@ -1,0 +1,13 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo Build started on `date`
+      - aws cloudformation deploy --template-file IAM.yaml --stack-name eksServiceRole --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --no-fail-on-empty-changeset
+      - aws cloudformation deploy --template-file VPC.yaml --stack-name eksVPC --capabilities CAPABILITY_IAM --region us-east-1 --no-fail-on-empty-changeset
+      - aws cloudformation deploy --template-file cluster.yaml --stack-name eksCluster --region us-east-1 --no-fail-on-empty-changeset
+      - aws cloudformation deploy --template-file nodes.yaml --stack-name eksNodes --region us-east-1 --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
+  post_build:
+    commands: 
+      - echo Build completed on `date`
